@@ -1,0 +1,15 @@
+.\obj\led8.o: USER\SRC\led8.c
+.\obj\led8.o: .\USER\INC\led8.h
+.\obj\led8.o: .\Libraries\CMSIS\stm32f4xx.h
+.\obj\led8.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
+.\obj\led8.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdint.h
+.\obj\led8.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_version.h
+.\obj\led8.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_compiler.h
+.\obj\led8.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\cmsis_armcc.h
+.\obj\led8.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\mpu_armv7.h
+.\obj\led8.o: .\Libraries\CMSIS\system_stm32f4xx.h
+.\obj\led8.o: .\USER\INC\stm32f4xx_conf.h
+.\obj\led8.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h
+.\obj\led8.o: .\Libraries\CMSIS\stm32f4xx.h
+.\obj\led8.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
+.\obj\led8.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
