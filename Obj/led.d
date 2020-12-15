@@ -1,6 +1,5 @@
 .\obj\led.o: USER\SRC\led.c
 .\obj\led.o: .\USER\INC\led.h
-.\obj\led.o: .\GeneralFunction\inc\sys.h
 .\obj\led.o: .\Libraries\CMSIS\stm32f4xx.h
 .\obj\led.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
 .\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdint.h
@@ -12,15 +11,5 @@
 .\obj\led.o: .\USER\INC\stm32f4xx_conf.h
 .\obj\led.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h
 .\obj\led.o: .\Libraries\CMSIS\stm32f4xx.h
-.\obj\led.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
-.\obj\led.o: .\uCOSII\CONFIG\includes.h
-.\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdio.h
-.\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\string.h
-.\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\ctype.h
-.\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdlib.h
-.\obj\led.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdarg.h
-.\obj\led.o: .\uCOSII\CORE\ucos_ii.h
-.\obj\led.o: .\uCOSII\CONFIG\os_cfg.h
-.\obj\led.o: .\uCOSII\PORT\os_cpu.h
 .\obj\led.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
-.\obj\led.o: .\USER\INC\delay.h
+.\obj\led.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h

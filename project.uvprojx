@@ -418,6 +418,26 @@
               <FileType>1</FileType>
               <FilePath>.\USER\SRC\usart2.c</FilePath>
             </File>
+            <File>
+              <FileName>usart3.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\usart3.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart4.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\usart4.c</FilePath>
+            </File>
+            <File>
+              <FileName>usart5.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\usart5.c</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\lcd.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -438,16 +458,21 @@
               <FileType>1</FileType>
               <FilePath>.\USER\SRC\run.c</FilePath>
             </File>
+            <File>
+              <FileName>queue.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\queue.c</FilePath>
+            </File>
+            <File>
+              <FileName>motor.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\motor.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>BSPLIB</GroupName>
           <Files>
-            <File>
-              <FileName>beep.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\USER\SRC\beep.c</FilePath>
-            </File>
             <File>
               <FileName>delay.c</FileName>
               <FileType>1</FileType>
@@ -468,6 +493,16 @@
               <FileType>1</FileType>
               <FilePath>.\USER\SRC\stm32f4xx_it.c</FilePath>
             </File>
+            <File>
+              <FileName>beep.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\beep.c</FilePath>
+            </File>
+            <File>
+              <FileName>key.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\key.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -479,14 +514,14 @@
               <FilePath>.\GeneralFunction\src\dma.c</FilePath>
             </File>
             <File>
-              <FileName>visual_scope.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\GeneralFunction\src\visual_scope.c</FilePath>
-            </File>
-            <File>
               <FileName>sys.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\GeneralFunction\src\sys.c</FilePath>
+            </File>
+            <File>
+              <FileName>visual_scope.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\GeneralFunction\src\visual_scope.c</FilePath>
             </File>
           </Files>
         </Group>

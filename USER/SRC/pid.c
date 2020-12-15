@@ -71,12 +71,12 @@ void PidRunPoint(void)
 		else
 			run_pid.err_now = position_now.y / run.line_k + run.line_b - position_now.x;
 	}
-	if (abs(run_pid.err_now) > 20) // 积分分离，阈值问题TODO:
+	if (ABS(run_pid.err_now) > 20) // 积分分离，阈值问题TODO:
 		run_pid.out += incremental_pi(run_pid);
 	else
 		run_pid.out += incremental_pid(run_pid);
 
-	if (abs(run_pid.out) < 0.1f) // 阈值有问题，才这点，检测一下多少。
+	if (ABS(run_pid.out) < 0.1f) // 阈值有问题，才这点，检测一下多少。
 		run_pid.out = 0;
 
 	run_pid.err_before = run_pid.err_last;
@@ -116,19 +116,19 @@ void PidLockPoint(Position volatile lock_position)
 	angle_pid.err_now = lock_position.angle - position_now.angle;
 	//PD调节
 
-	if (abs(lock_point_pid_x.err_now) < 0.1f)
+	if (ABS(lock_point_pid_x.err_now) < 0.1f)
 		lock_point_pid_x.err_now = 0;
-	if (abs(lock_point_pid_y.err_now) < 0.1f)
+	if (ABS(lock_point_pid_y.err_now) < 0.1f)
 		lock_point_pid_y.err_now = 0;
-	if (abs(angle_pid.err_now) < 0.1f)
+	if (ABS(angle_pid.err_now) < 0.1f)
 		angle_pid.err_now = 0;
 
-	if (abs(lock_point_pid_x.err_now) <= 5)
+	if (ABS(lock_point_pid_x.err_now) <= 5)
 	{
 		update_pid_para(lock_point_pid_x, pid_para_lock_point_x2);
 		velocity_set.Vx = position_pid(lock_point_pid_x);
 	}
-	else if (abs(lock_point_pid_x.err_now) <= 20)
+	else if (ABS(lock_point_pid_x.err_now) <= 20)
 	{
 		update_pid_para(lock_point_pid_x, pid_para_lock_point_x1);
 		velocity_set.Vx = position_pid(lock_point_pid_x);
@@ -139,12 +139,12 @@ void PidLockPoint(Position volatile lock_position)
 		velocity_set.Vx = position_pid(lock_point_pid_x);
 	}
 
-	if (abs(lock_point_pid_y.err_now) <= 5)
+	if (ABS(lock_point_pid_y.err_now) <= 5)
 	{
 		update_pid_para(lock_point_pid_y, pid_para_lock_point_y2);
 		velocity_set.Vy = position_pid(lock_point_pid_y);
 	}
-	else if (abs(lock_point_pid_y.err_now) <= 20)
+	else if (ABS(lock_point_pid_y.err_now) <= 20)
 	{
 		update_pid_para(lock_point_pid_y, pid_para_lock_point_y1);
 		velocity_set.Vy = position_pid(lock_point_pid_y);
@@ -178,8 +178,8 @@ void PidLockPoint(Position volatile lock_position)
 	}
 
 	//限定角速度
-	if (abs(velocity_set.Vw) > 130)
-		velocity_set.Vw = sig(velocity_set.Vw) * 130;
+	if (ABS(velocity_set.Vw) > 130)
+		velocity_set.Vw = SIG(velocity_set.Vw) * 130;
 	SetChassisVelocity(velocity_set, position_now.angle);
 }
 /**
@@ -189,7 +189,7 @@ void PidLockPoint(Position volatile lock_position)
 void PidLockAngle(float lock_angle)
 {
 	angle_pid.err_now = lock_angle - position_now.angle;
-	if (abs(angle_pid.err_now) < 0.1f)
+	if (ABS(angle_pid.err_now) < 0.1f)
 		angle_pid.err_now = 0;
 
 	velocity_set.Vw = position_pid(angle_pid);
@@ -210,9 +210,8 @@ void PidLockAngle(float lock_angle)
 		angle_pid.err_sum += angle_pid.err_now;
 
 	//输出限幅
-	if (abs(velocity_set.Vw) > 130)
-#include "stm32f4xx.h"                  // Device header
-		velocity_set.Vw = sig(velocity_set.Vw) * 130;
+	if (ABS(velocity_set.Vw) > 130)
+		velocity_set.Vw = SIG(velocity_set.Vw) * 130;
 }
 
 /** 

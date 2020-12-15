@@ -1,5 +1,5 @@
 #include "stm32f4xx_it.h"
-
+#include "led.h"
 #include "delay.h"
 
 
@@ -22,8 +22,6 @@ void NMI_Handler(void)
   * @retval None
   */
 
-//extern char str_Err[10];
-//extern void LCD_Show(void);
 void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
@@ -31,8 +29,9 @@ void HardFault_Handler(void)
 	
   while (1)
   {
-			Delay_ms(500);
-		  Led8DisData(9);
+		Delay_ms(500);
+		LED_BLUE_ON;
+		Led8DisData(9);
   }
 }
 
