@@ -1,8 +1,18 @@
+/*
+ * @Descripttion: 
+ * @version: µÚÒ»°æ
+ * @Author: ¶£ßËµ°
+ * @Date: 2020-12-15 19:29:28
+ * @LastEditors: ¶£ßËµ°
+ * @LastEditTime: 2020-12-16 10:22:40
+ * @FilePath: \hu_sir-contorl\USER\INC\pid.h
+ */
 #ifndef __PID_H_
 #define __PID_H_
 #include "stm32f4xx.h"
 #include "param.h"
 #include "run.h"
+#include "MyMath.h"
 
 #define bgroup1 1
 #define bgroup2 2
@@ -18,11 +28,9 @@
 #define incremental_pi(pid) pid.kp *(pid.err_now - pid.err_last) + pid.ki *pid.err_now
 
 #define update_pid_para(pid, para) \
-    {                              \
-        pid.kp = para[0];          \
-        pid.ki = para[1];          \
-        pid.kd = para[2];          \
-    }
+    pid.kp = para[0];              \
+    pid.ki = para[1];              \
+    pid.kd = para[2]
 
 extern unsigned char bezier_group;
 
@@ -43,7 +51,7 @@ extern float pid_para_lock_point_y[3];
 extern float pid_para_lock_point_y1[3];
 extern float pid_para_lock_point_y2[3];
 
-void Pid_Act(void);
+void pid_act(void);
 void PidInit(volatile PidStruct *pid_set, float *pid_para);
 float PidOpreration(void);
 void PidLockAngle(float lock_angle);

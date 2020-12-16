@@ -1,86 +1,85 @@
-#ifndef __STRUCT_H
-#define __STRUCT_H
+/*** 
+ * @Date: 2020-07-25 10:35:58
+ * @LastEditors   未定义
+ * @LastEditTime  2020-09-25 16:47:48
+ * @FilePath      \Project\User\inc\MyStruct.h
+ */
+#ifndef __MY_STRUCT_H
+#define __MY_STRUCT_H
 #include "stm32f4xx.h"
-//本文件定义CAN、USART、RUN相关量
-#define CAN1_NodeNumber				 4u
-#define CAN2_NodeNumber				 8u
 
-#define CAN_SENDQUEUESIZE 		 50
+//TODO:必须重构结构体，对各个部分都需要好好分类，
 
-/*** CAN_Related ***/	
-typedef struct//简化过的CAN报文/
+//这个数据，是不是可以通过监控一波来给定一个size
+#define CAN_SENDQUEUESIZE 30
+#define CAN_HAVESENDQUEUESIZE 5
+#define USART_SENDQUEUESIZE 500
+
+//表示flag的状态，0表示假，1表示真，具有普适性
+#define True 1
+#define False 0
+#define Fine 1
+#define Error 0
+#define On 1
+#define Off 0
+
+enum _ErrFlag__
 {
-  u32 Id;
-  u8 DLC;
-  u8 Data[8];
-	u8 WaitFlag;//FALSE/TRUE
-}Can_Sendstruct;
+	FuncIDErr = 0, //     0x00
+	SubIDtan90,	   // 	  0x01
+	DataLengthErr, //     0x02
+	SubIDUseErr,   //     0x03
+	DataErr		   //  	  0x04
+};
 
-typedef struct//CAN报文队列
+//底盘坐标与角度
+typedef struct _POSITION
 {
-	uint8_t Can_sendqueuesize;
-	uint16_t Front,Rear;
-	Can_Sendstruct head[CAN_SENDQUEUESIZE];	
-}Can_Sendqueue;
-
-typedef struct//CAN报文控制列表
-{
-		s32 SendNumber;
-		s32	ReceiveNumber;
-		u32 QUEUEFullTimeout;
-		u8  TimeOut;
-		s32	SendSem;       
-}MesgControlGrp;
-
-/*** USART_Related ***/	
-typedef enum
-{
-	USART1_Tx_BufferSize=51,//串口一发送数据长度
-	USART2_Tx_BufferSize=600,//串口二发送数据长度
-	USART3_Tx_BufferSize=32,//串口三发送数据长度
-	
-	USART1_Rx_BufferSize=32,//串口一接收数据长度（接收中断内使用）
-	USART2_Rx_BufferSize=32,//串口二接收数据长度（接收中断内使用）
-	USART3_Rx_BufferSize=32,//串口三接收数据长度（接收中断内使用）
-	
-}Usart_Enum;
-
-typedef struct
-{
-	u8 TxBuffer_UASRT1[USART1_Tx_BufferSize];//串口一发送数据
-	u8 RxBuffer_USART1[USART1_Rx_BufferSize];//串口一接收数据	
-
-	u8 TxBuffer_UASRT2[USART2_Tx_BufferSize];//串口二发送数据
-	u8 RxBuffer_USART2[USART2_Rx_BufferSize];//串口二接收数据
-
-	u8 TxBuffer_UASRT3[USART3_Tx_BufferSize];//串口三发送数据
-	u8 RxBuffer_USART3[USART3_Rx_BufferSize];//串口三接收数据
-	
-}Usart_Struct;
-
-/*** USART_Related ***/	
-typedef struct
-{
-	float x;
-	float y;
+	/* data */
+	float x; //x axis
+	float y; //y axis
 	float angle;
-}Position;
+} Position;
 
-typedef struct
+//通用笛卡尔坐标系XY坐标
+typedef struct _COORDINATES
 {
-	float x;
-	float y;
-}Coordinates;
+	/* data */
+	float x; //x axis
+	float y; //y axis
+} Coordinates;
 
-typedef struct//底盘速度矢量
+//底盘速度矢量
+typedef struct _VELOCITY
 {
+	/* data */
 	float V;
 	float Vx;
 	float Vy;
 	float Vw;
-}Velocity;
+} Velocity;
 
-typedef struct//单个舵轮的运动状态量
+//贝塞尔曲线上点的相应属性
+typedef struct _BEZIERPOINT
+{
+	/* data */
+	float x;		 //x axis
+	float y;		 //y axis
+	float t;		 //t in bezier_T
+	float curvature; //曲率
+} BezierPoint;
+
+//Bezier曲线描述结构体TODO:
+typedef struct _BEZIERSTRUCT
+{
+	/* data */
+	Coordinates P[4]; //四个控制点
+	float x_t[4];	  //x参数方程的系数
+	float y_t[4];	  //y参数方程的系数
+} BezierStruct;
+
+//单个舵轮的运动状态量
+typedef struct _WHEELINFO
 {
 	/* data */
 	float V;
@@ -90,7 +89,8 @@ typedef struct//单个舵轮的运动状态量
 	u8 quadrant; //根据正负判定象限
 } WheelInfo;
 
-typedef struct//pid结构体
+//pid结构体
+typedef struct _PIDSTRUCT
 {
 	/* data */
 	float kp;
@@ -106,7 +106,8 @@ typedef struct//pid结构体
 	float out;
 } PidStruct;
 
-typedef struct//time结构体，存放一些监控的时间变量
+//time结构体，存放一些监控的时间变量
+typedef struct _TIMESTRUCT
 {
 	/* flag */
 	u8 count_time;
@@ -123,7 +124,8 @@ typedef struct//time结构体，存放一些监控的时间变量
 	float down_use;
 } TimeStruct;
 
-typedef struct//DT测距数据相应结构体
+//DT测距数据相应结构体
+typedef struct _DTSTRUCT
 {
 	/* 不同方向的DT数据 */
 	float x1_dis;
@@ -134,12 +136,11 @@ typedef struct//DT测距数据相应结构体
 	u8 FlagDt50_1;
 } DTStruct;
 
-typedef struct//调试定位结构体
+//调试定位结构体
+typedef struct _DEBUGPOSISTRUCT
 {
 	/* data */
-	u8 xyr;			//debug_mode：x or y or rotate
-	u8 process_num; // num of process
-
+	u8 xyr; //debug_mode：x or y or rotate
 	float speed_max_limited;
 	float speed_start;
 	float speed_rotate; //自转速度
@@ -149,7 +150,28 @@ typedef struct//调试定位结构体
 	float dis_down;
 } DebugPosiStruct;
 
-typedef struct //跑动标志位
+enum _DEBUG_POSI
+{
+	x_dir,
+	y_dir,
+	rotate_dir,
+};
+
+//can & usart queue flag，
+typedef struct _QUEUEFLAGSTRUCT
+{
+	/* flag */
+	u8 can1_queue_full;
+	u8 can2_queue_full;
+	u8 can_queue_empty;
+	u8 usart_queue_empty;
+	u8 usart_queue_full;
+	u8 Can1ControlList; //FIXME:
+	u8 Can2ControlList;
+} QueueFlagStruct;
+
+//flags of RunPoint or run_bizier
+typedef struct _RUNFLAGSTRUCT
 {
 	/* flag */
 	u8 speed_up;	  //是否需要加速
@@ -194,7 +216,7 @@ typedef struct //跑动标志位
 	float now_dis;			 //reserved
 } RunFlagStruct;
 
-enum
+enum _ENUM_RUN_
 {
 	/* speed_down_mode */
 	SQUAREROOT = 0,
@@ -206,37 +228,73 @@ enum
 	/* auto_type */
 	RUNPOINT,
 	RUNBEZIER,
-	
+
 	/* pid_line_type */
 	pid_line_x,
 	pid_line_y,
-
 };
 
-typedef struct
+//flags of elmo & motor
+enum _MOTORSTATE
+{
+	breaking,
+	enable,
+	disable,
+};
+
+typedef struct _MOTORFLAGSTRUCT
 {
 	/* flag & data */
+	enum _MOTORSTATE state;
 	u32 encoder_resolution;
 	float reduction;
 } MotorFlagStruct;
 
-typedef struct//flags of gyroscope
+//flags of gyroscope
+typedef struct _GYROSCOPEFLAGSTRUCT
 {
 	/* flag */
 	u8 check_drift;
 	u8 init_success;
 	u8 state;
+	u8 angle_err;
 	/* data */
 	float angle_check[2];
 	u16 over_time;
 } GyroscopeFlagStruct;
 
-typedef struct//flags of camera
+//flags of camera
+typedef struct _CAMERAFLAGSTRUCT
 {
 	/* flag */
 	u8 read_data;
 	u8 on_off;
 } CameraFlagStruct;
+
+typedef enum
+{
+	USART1_Tx_BufferSize=51,//串口一发送数据长度
+	USART2_Tx_BufferSize=600,//串口二发送数据长度
+	USART3_Tx_BufferSize=32,//串口三发送数据长度
+	
+	USART1_Rx_BufferSize=32,//串口一接收数据长度（接收中断内使用）
+	USART2_Rx_BufferSize=32,//串口二接收数据长度（接收中断内使用）
+	USART3_Rx_BufferSize=32,//串口三接收数据长度（接收中断内使用）
+	
+}Usart_Enum;
+
+typedef struct
+{
+	u8 TxBuffer_UASRT1[USART1_Tx_BufferSize];//串口一发送数据
+	u8 RxBuffer_USART1[USART1_Rx_BufferSize];//串口一接收数据	
+
+	u8 TxBuffer_UASRT2[USART2_Tx_BufferSize];//串口二发送数据
+	u8 RxBuffer_USART2[USART2_Rx_BufferSize];//串口二接收数据
+
+	u8 TxBuffer_UASRT3[USART3_Tx_BufferSize];//串口三发送数据
+	u8 RxBuffer_USART3[USART3_Rx_BufferSize];//串口三接收数据
+	
+}Usart_Struct;
 
 //flags of usart_dma
 typedef struct _USARTDMAFLAGSTRUCT
@@ -249,8 +307,50 @@ typedef struct _USARTDMAFLAGSTRUCT
 	u8 Usart5DmaSendFinish;
 } UsartDmaFlagStruct;
 
+//flags of mechanism
+typedef struct _MECHANISMFLAGSTRUCT
+{
+	/* flag */
+	u8 Grasp_Mechanism3508Status;
+	u8 Chain_Mechanism3508Status;
+	u8 Pitch_Mechanism3508Status;
+	u8 Token_Mechanism3508Status;
+	u8 ServoStatus;
+	u8 ResetToken;
+	u8 ResetTokenRun;
+	u8 RunPointShot;
+	u8 AdjustShotPoint;
+	u8 runShotFlag;
+} MechanismFlagStruct;
+
+//串口屏相应结构体
+typedef struct _LCDSTRUCT
+{
+	/* flag */
+	u8 screen_id;	  //当前画面id
+	u8 switch_screen; //是否切换画面
+	u8 show_area;	  //显示红蓝场
+	u8 show_speed;	  //显示速度在仪表盘
+	u8 read_id;		  //上电后读取手柄当前id
+} LcdStruct;
+
+//flags of user
+typedef struct _USERFLAGSTRUCT
+{
+	/* flag */
+	u8 identity;	   // master or etc..
+	u8 run_mode;	   // auto or ps2
+	s8 area_side;	   //red or blue, : now_side,
+	s8 area_side_last; // last_side. (for LCD show)
+	u8 debug_mode;	   //point or bezier or ps2_play
+	/* data */
+	char error[20];
+	u16 overtime;
+} UserFlagStruct;
+
 //enum for user
-enum{
+enum _USER
+{
 	Master = 0,
 	Location = 1,
 	Mechanism = 2,
@@ -283,7 +383,74 @@ typedef struct _CHASSIS
 
 } ChassisStruct;
 
+// typedef struct _FLAGSTRUCT
+// {
+// 	/* data */
+// 	//不知道是啥的东西，保留
+// 	u8 ResetNum;
+// 	u8 ResetRun;
+// 	u8 ShotPosition;
+// 	u8 FirstRun;
+// 	u8 DataErr;
+// 	u8 count_time_flag;
+// 	u8 EmergencyStart;
+// 	u8 CountStart;
+// 	u8 PowerSwitch;
+// 	u8 BeepNum;
+// 	u8 PidFinish;
+// 	u8 ContinueRun;
 
+// } FlagStruct;
+
+/* 简化过的CAN报文 */
+typedef struct _CAN_SENDSTRUCT
+{
+	u32 Id;
+	u8 DLC;
+	u8 Data[8];
+	u8 InConGrpFlag;
+} CanSendStruct;
+
+/*************************************简化过的Usart报文************************************** */
+typedef struct _USARTSENDSTRUCT
+{
+	u8 DLC;
+	char Data[5];
+	u8 InConGrpFlag;
+} UsartSendstruct;
+
+/* CAN报文队列 */
+typedef struct _Can_HaveSendqueue
+{
+	u8 Can_sendqueuesize;
+	u8 Front, Rear;
+	CanSendStruct node[CAN_HAVESENDQUEUESIZE];
+} Can_HaveSendqueue;
+
+/* CAN报文队列 */
+typedef struct _Can_Sendqueue
+{
+	u8 Can_sendqueuesize;
+	u16 Front, Rear;
+	CanSendStruct node[CAN_SENDQUEUESIZE];
+} CanSendqueue;
+
+typedef struct _Usart_Sendqueue
+{
+	u16 usart_sendqueuesize;
+	u16 length;
+	u16 Front, Rear;
+	uint8_t Data[USART_SENDQUEUESIZE];
+} UsartSendqueue;
+
+typedef struct _MesgControlGrp
+{
+	s32 SendNumber;
+	s32 ReceiveNumber;
+	u32 QUEUEFullTimeout;
+	u8 TimeOut;
+	s32 SendSem;
+	Can_HaveSendqueue SentQueue;
+} MesgControlGrp;
 
 #endif
-

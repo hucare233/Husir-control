@@ -10,7 +10,6 @@
 #include "param.h"
 #include "motor.h"
 
-
 void USART3_Configuration(void);
 
 #endif

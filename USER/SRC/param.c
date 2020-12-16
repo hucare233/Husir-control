@@ -1,90 +1,122 @@
+/*** 
+ * @Date: 2020-12-03 01:29:51
+ * @LastEditors   叮咚蛋
+ * @LastEditTime  2020-09-09 19:10:29
+ * @FilePath      \Project\User\src\Master_para.c
+ */
+
 #include "param.h"
 
+/* Struct */
+UserFlagStruct user;
+u8 USART1_DMA_SendBuf[USART_SENDQUEUESIZE];
+u8 USART2_DMA_SendBuf[USART_SENDQUEUESIZE];
+u8 USART3_DMA_SendBuf[USART_SENDQUEUESIZE];
+u8 UART4_DMA_SendBuf[USART_SENDQUEUESIZE];
+u8 UART5_DMA_SendBuf[USART_SENDQUEUESIZE];
 volatile RunFlagStruct run;
+volatile LcdStruct lcd;
 volatile TimeStruct run_time;
+volatile DebugPosiStruct debug_posi;
 volatile GyroscopeFlagStruct gyroscope;
+volatile CameraFlagStruct camera;
+volatile MechanismFlagStruct mechanism;
 volatile MotorFlagStruct motor;
 volatile ChassisStruct chassis;
 
-/* 全局变量 */
-INT8U *Err_MotorDetect;
-OS_FLAG_GRP *Motor_Detect;
+volatile UsartDmaFlagStruct usart_dma = {
+	True,
+	True,
+	True,
+	True,
+	True,
+};
 
-//以下二维数组均按position,speed,current顺序建立
-float Motor_Para[3][4]={0};//电机实际参数
-u8 Detect_Flag[3][4]={0};//检测标志位
-u8*Det_Pointer=&(Detect_Flag[0][0]);//检测报文当前顺序指针
-float Detect_Para[3][4]={0};//检测触发值
-float*Det_Para_Pointer=&Detect_Para[0][0];
-int beep=0;
-void (*Func[3])(u8,u8)={Elmo_Query_Position,Elmo_Query_Position,Elmo_Query_Position};
+/* ucosii */
+OS_CPU_SR cpu_sr = 0u;
 
-/* 结构体 */
-FlagStruct FlagPara;
-MoveStruct MovePara={0};
+OS_EVENT *RUN;
+OS_EVENT *RDY;
+OS_EVENT *BALL;
+OS_EVENT *SHUT;
 
-/* CAN */
-Can_Sendqueue can1_sendqueue;
-Can_Sendqueue can2_sendqueue;
+OS_FLAG_GRP *FlagCan1Check;
+OS_FLAG_GRP *FlagCan2Check;
 
-MesgControlGrp CAN1_MesgSentList[CAN1_NodeNumber];
-MesgControlGrp CAN2_MesgSentList[CAN2_NodeNumber];
+INT8U *ErrorRUN;
+INT8U *ErrorRDY;
+INT8U *ErrorBALL;
+INT8U *ErrorSHUT;
+INT8U *ErrorCan1;
+INT8U *ErrorCan2;
 
-/* Usart */
-Usart_Struct USART;
-
-void ParaInit()
+void para_init()
 {
-		/* init motor struct */
-	motor.encoder_resolution = 4096; // EC 30: 1000   U10: 4096
-	motor.reduction = 1.0f;			 // EC 30: 169/9 = 18.7778  U10: 1
+	char temp[15] = "Well!!!";
 
-	chassis.WheelD = 15.1f;
+	/* init motor struct */
+	motor.state = disable;
+	motor.encoder_resolution = 1000; // EC 30: 1000   U10: 4096
+	motor.reduction = 18.7778f;		 // EC 30: 169/9 = 18.7778  U10: 1
+
+	/* init chassis physical para */
+	chassis.width_half = 15.5f;
+	chassis.length_half = 15.5f;
+	// chassis.omni_wheel2center = 30.0f;
+	chassis.WheelD = 15.0f;
+	chassis.reduction_turn = 12.0f; // FIXME: 一定要统一协议啊，吐血
 	chassis.K_V_motor = motor.reduction * 60.0f / (PI * chassis.WheelD);
-	chassis.static_friction_coefficient = 0.7f;
-	chassis.dynamic_friction_coefficient = 0.6f;
+	chassis.static_friction_coefficient = 1.0f;
+	chassis.dynamic_friction_coefficient = 0.9f;
 
-	run.speed_max_limited = 100.0f; // user should set or reset the limited speed befor your run_task to ensure your and robot's serity
+	/* init user struct */
+	user.identity = Other;
+	user.area_side = red_area;
+	user.area_side_last = red_area;
+	user.run_mode = auto_mode;
+	user.debug_mode = debug_point;
+	strcpy(user.error, temp);
+	run.speed_max_limited = 100.f; // user should set or reset the limited speed befor your run_task to ensure your and robot's serity
+
+	/* init run_time flag */
+	run_time.count_time = False;
+
+	/* init lcd struct */
+	lcd.screen_id = 0;
+	lcd.show_area = True;
+	lcd.show_speed = False;
+	lcd.switch_screen = False;
+	lcd.read_id = True;
+
+	/* init debug_posi struct */
+	debug_posi.xyr = y_dir;
+	debug_posi.speed_max_limited = 100;
+	debug_posi.dis_up = 100;
+	debug_posi.dis_down = 100;
+	debug_posi.points_zero[0] = 0;
+	debug_posi.points_zero[1] = 0;
+	debug_posi.points_zero[2] = 0.0f;
+	debug_posi.points[x_dir][0] = 500;
+	debug_posi.points[x_dir][1] = 0;
+	debug_posi.points[x_dir][2] = 0.0f;
+	debug_posi.points[y_dir][0] = 0;
+	debug_posi.points[y_dir][1] = 500;
+	debug_posi.points[y_dir][2] = 0.0f;
+	debug_posi.speed_rotate = 0;
+	debug_posi.speed_start = 50;
 
 	/* init gyroscope struct */
-	gyroscope.init_success = FALSE;
-	gyroscope.state = ERR_Status;
-	
-	FlagPara.Task_Begin_Flag=FALSE;
-	FlagPara.Status_Controller=WELL;
-	FlagPara.Warning_Flag=0;
-	FlagPara.Error_Flag=0;
-	FlagPara.Mode_Run=BRAKE;
-	FlagPara.Mode_Red_Blue=UNSELECTED;
-	FlagPara.Mode_Auto=DISABLE;
-	FlagPara.Can1DetectFlag=DISABLE;
-	FlagPara.Can2DetectFlag=DISABLE;
-	FlagPara.Motor_Emer_Flag=FALSE;
-	FlagPara.Motor_Emer_Code=0;
-	
-	FlagPara.Usart1DmaSendFinish=TRUE;
-	FlagPara.Usart2DmaSendFinish=TRUE;
-	FlagPara.Usart3DmaSendFinish=TRUE;
-	FlagPara.Usart4DmaSendFinish=TRUE;
-	FlagPara.Usart5DmaSendFinish=TRUE;
-	
+	gyroscope.init_success = False;
+	gyroscope.state = Error;
+	gyroscope.angle_err = 0;
+
+	/* init camera struct */
+	camera.on_off = False;
+	camera.read_data = False;
+
+	/* init usart_dma flag */
+	usart_dma.Usart2DmaSendFinish = True;
+
+	/* init mechanism struct */
+	// mechanism.balabalabala
 }
-
-void EncodeFloatData(float* f, u8* buff)
-{
-	s32 date;
-	date=* f;
-	*buff=date&0x000000FF;
-	*(buff+1)=(date&0x0000FF00)>>8;
-	*(buff+2)=(date&0x00FF0000)>>16;
-	*(buff+3)=(date&0xFF000000)>>24;
-}
-
-void DncodeFloatData(float* f, unsigned char* buff)
-{
-	s32 date;
-	date=*buff|(*(buff+1)<<8)|(*(buff+2)<<16)|(*(buff+3)<<24);
-	* f=date;
-}
-
-

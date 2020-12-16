@@ -14,7 +14,7 @@ extern char str_ElectorMagnet[8];
 extern char str_Cylinder[8];
 extern u32 Delay_time;
 void USART1_Configuration(void);
-void USART1_sendData(u8 *a,u8 count);
+void USART1_sendData(u8 *a, u8 count);
 void usart_txhander(void);
 
 #endif
