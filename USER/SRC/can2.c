@@ -4,7 +4,7 @@
  * @Author: ¶£ßËµ°
  * @Date: 2020-12-15 19:29:29
  * @LastEditors: ¶£ßËµ°
- * @LastEditTime: 2020-12-16 10:09:12
+ * @LastEditTime: 2020-12-16 15:09:26
  * @FilePath: \hu_sir-contorl\USER\SRC\can2.c
  */
 
@@ -614,7 +614,7 @@ void CAN2_RX0_IRQHandler(void)
 	}
 }
 /**
-  * @brief  CAN2¡Á??¨¬
+  * @brief  CAN2×Ô¼ì
   */
 void Can2selfcheck(u8 InConGrpFlag)
 {

@@ -4,7 +4,7 @@
  * @Author: ¶£ßËµ°
  * @Date: 2020-12-15 19:34:33
  * @LastEditors: ¶£ßËµ°
- * @LastEditTime: 2020-12-16 10:34:06
+ * @LastEditTime: 2020-12-16 15:21:17
  * @FilePath: \hu_sir-contorl\USER\SRC\queue.c
  */
 
@@ -77,7 +77,7 @@ void Can_DeQueue(u8 CAN_x, CanSendqueue *can_queue)
 	{
 		queue_flag.usart_queue_full = False;
 
-		if (can_queue->node[can_queue->Front].Id < 0x400)
+		if (can_queue->node[can_queue->Front].Id < 0x800)//epos id 0x60x
 		{
 			TxMessage.StdId = can_queue->node[can_queue->Front].Id;
 			TxMessage.IDE = CAN_ID_STD;

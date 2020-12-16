@@ -137,18 +137,20 @@ void CAN1_RX0_IRQHandler(void)
 					}
 					else
 					{
+						/*获取绝对速度*/
 						velocity_abs.Vx = (double)((s16)(((u16)(rx_message.Data[3]) << 8) | rx_message.Data[2])) * 0.1;
 						velocity_abs.Vy = (double)((s16)(((u16)(rx_message.Data[5]) << 8) | rx_message.Data[4])) * 0.1;
 						velocity_now.Vw = (double)((s16)(((u16)(rx_message.Data[7]) << 8) | rx_message.Data[6])) * 0.1;
 
+                        /*根据绝对速度计算相对速度*/
 						velocity_now.Vx = velocity_abs.Vx * cos(position_now.angle / 180 * PI) + velocity_abs.Vy * sin(position_now.angle / 180 * PI);
-
 						velocity_now.Vy = (-velocity_abs.Vx * sin(position_now.angle / 180 * PI) + velocity_abs.Vy * cos(position_now.angle / 180 * PI));
+
 						velocity_now.V = sqrt(velocity_now.Vx * velocity_now.Vx + velocity_now.Vy * velocity_now.Vy);
 					}
 					break;
 				}
-				case 'C': //?
+				case 'C': //里在干什莫
 				{
 					CAN1_MesgSentList[0].ReceiveNumber += 1;
 					CAN1_MesgSentList[0].TimeOut = 0;
@@ -174,7 +176,7 @@ void CAN1_RX0_IRQHandler(void)
 					OSFlagPost(FlagCan1Check, 0x01, OS_FLAG_SET, ErrorCan1);
 					break;
 				}
-				case 'A':
+				case 'A':  //询问陀螺仪状态
 				{
 					if (rx_message.Data[2] == 'S' && rx_message.Data[3] == 'K')
 						gyroscope.init_success = rx_message.Data[4];
@@ -442,7 +444,7 @@ void GyroSetXandA(float x, float A, u8 InConGrpFlag)
 /**
   * @brief  设置重定位零点
   */
-void ResetPosition_EN(float x, float y, float angle, u8 InConGrpFlag)
+void ResetPosition_EN(float x, float y, float angle, u8 InConGrpFlag)//ASK:发送这三个数据的处理是什么
 {
 
 	if (Rear1 == can1_sendqueue.Front)
@@ -492,6 +494,7 @@ void FrontDJIMotor_SZ()
 	}
 	can1_sendqueue.Rear = Rear1;
 }
+
 void FrontDJIMotor_ASK(void)
 {
 	if (Rear1 == can1_sendqueue.Front)
@@ -870,6 +873,7 @@ void AngleStop(void)
 	}
 	can1_sendqueue.Rear = Rear1;
 }
+
 void UnlockTouchCheckF(void)
 {
 	if (Rear1 == can1_sendqueue.Front)
@@ -888,6 +892,7 @@ void UnlockTouchCheckF(void)
 	}
 	can1_sendqueue.Rear = Rear1;
 }
+
 void LockTouchCheckF(void)
 {
 	if (Rear1 == can1_sendqueue.Front)

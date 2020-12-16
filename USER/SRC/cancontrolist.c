@@ -4,7 +4,7 @@
  * @Author: ¶£ßËµ°
  * @Date: 2020-12-10 20:21:29
  * @LastEditors: ¶£ßËµ°
- * @LastEditTime: 2020-12-16 10:11:10
+ * @LastEditTime: 2020-12-16 15:29:14
  * @FilePath: \hu_sir-contorl\USER\SRC\cancontrolist.c
  */
 
@@ -98,6 +98,7 @@ void TraversalControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_qu
 				can_queue->Rear = (can_queue->Rear + 1) % (can_queue->Can_sendqueuesize);
 				CAN_MesgSentList[i].SentQueue.Front = (CAN_MesgSentList[i].SentQueue.Front + 1) % CAN_MesgSentList[i].SentQueue.Can_sendqueuesize;
 			}
+			/***±£»¤´ëÊ©***/
 			if (CAN_MesgSentList[i].QUEUEFullTimeout > 10 || CAN_MesgSentList[i].SendNumber - CAN_MesgSentList[i].ReceiveNumber > 200)
 			{
 				Beep_Show(8);

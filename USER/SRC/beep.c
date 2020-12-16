@@ -1,3 +1,12 @@
+/*
+ * @Descripttion: 
+ * @version: ???
+ * @Author: ???
+ * @Date: 2020-12-15 19:29:29
+ * @LastEditors: ???
+ * @LastEditTime: 2020-12-16 14:08:03
+ * @FilePath: \hu_sir-contorl\USER\SRC\beep.c
+ */
 #include "beep.h"
 u8 beep_on_num;
 /** 
@@ -22,9 +31,9 @@ void Beep_Show(u8 num)
 	for (int i = 0; i < num; i++)
 	{
 		BEEP_ON;
-		Delay_ms(200);
+		OSTimeDly(2000);
 		BEEP_OFF;
-		Delay_ms(200);
+		OSTimeDly(2000);
 	}
 }
 

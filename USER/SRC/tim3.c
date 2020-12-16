@@ -4,7 +4,7 @@
  * @Author: ¶£ßËµ°
  * @Date: 2020-10-28 16:06:45
  * @LastEditors: ¶£ßËµ°
- * @LastEditTime: 2020-12-16 10:09:43
+ * @LastEditTime: 2020-12-16 15:11:41
  * @FilePath: \hu_sir-contorl\USER\SRC\tim3.c
  */
 #include "tim3.h"
@@ -45,5 +45,13 @@ void TIM3_IRQHandler(void)
 			Can_DeQueue(CAN_1, &can1_sendqueue);
 		if (can2_sendqueue.Rear != can2_sendqueue.Front)
 			Can_DeQueue(CAN_2, &can2_sendqueue);
+		if (True == queue_flag.Can1ControlList)
+		{
+			TraversalControlList(CAN1_MesgSentList, &can1_sendqueue, CAN_1);
+		}
+		if (True == queue_flag.Can2ControlList)
+		{
+			TraversalControlList(CAN2_MesgSentList, &can2_sendqueue, CAN_2);
+		}
 	}
 }

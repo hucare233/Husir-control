@@ -4,7 +4,7 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-13 15:19:59
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 11:13:16
+ * @LastEditTime: 2020-12-16 14:46:19
  * @FilePath: \hu_sir-contorl\USER\SRC\main.c
  */
 #include "main.h"
@@ -84,7 +84,7 @@ static void TaskStart(void *pdata)
 	Elmo_Ele(0);	  // 启动can通信协议, 这个指令必须在应急指令发出之后发送才有效，否则会开启协议失败，只要保证上强再上就不会发生这情况
 					  ///
 	Can1selfcheck(0); //流程号复位，要多次执行？
-	Can1selfcheck(0);
+	Can2selfcheck(0);
 	Elmo_GetVX(0); //TODO:can2自检，封装一个函数，协议改一改，自检写个循环，多发几次
 
 	OSFlagPend(FlagCan1Check, 0x0000, OS_FLAG_WAIT_SET_ALL, 500, ErrorCan1);
@@ -305,8 +305,10 @@ static void TaskGyroscope(void *pdata)
 	}
 	for (;;)
 	{
+		static int gyroscope_cnt;
 		if (True == gyroscope.check_drift)
 		{
+			gyroscope_cnt++;
 			gyroscope.angle_check[0] = position_now.angle;
 			if (gyroscope.angle_check[0] - gyroscope.angle_check[1] > 0.05f) // angle_now - angle_last > 0.05度，
 			{
@@ -314,20 +316,22 @@ static void TaskGyroscope(void *pdata)
 			}
 			gyroscope.angle_check[1] = gyroscope.angle_check[0]; // 更新角度值
 			OSTimeDly(200);
-
-			if (gyroscope.angle_err > 3)
+			if (gyroscope_cnt == 10)
 			{
-				Beep_Show(8);
-				sprintf(user.error, "%s", "GyroDrift");
-				gyroscope.state = Error;
-				gyroscope.check_drift = False;
-				break;
-			}
-			else
-			{
-				gyroscope.state = Fine;
-				gyroscope.check_drift = False;
-				break;
+				if (gyroscope.angle_err > 3)
+				{
+					Beep_Show(8);
+					sprintf(user.error, "%s", "GyroDrift");
+					gyroscope.state = Error;
+					gyroscope.check_drift = False;
+					break;
+				}
+				else
+				{
+					gyroscope.state = Fine;
+					gyroscope.check_drift = False;
+					break;
+				}
 			}
 		}
 		else
@@ -366,7 +370,7 @@ static void TaskLED(void *pdata)
 	pdata = pdata;
 	for (;;)
 	{
-		if ((user.area_side == red_area && Master == user.identity) || (x_dir == debug_posi.xyr && Location == user.identity))
+		if ((user.area_side == red_area && Master == user.identity) || (x_dir == debug_posi.xyr && Location == user.identity)) //主控或者定位跑x
 		{
 			LED_RED_ON;
 			LED_BLUE_OFF;
@@ -394,7 +398,7 @@ u8 num_temp = 0;
 u8 BEEP_OFF_flag = False;
 /*** 
  * @brief 
- * @author 未定义
+ * @author 叮咚蛋
  * @Date 2020-08-10 17:28:32
  */
 static void TaskBEEP(void *pdata)
