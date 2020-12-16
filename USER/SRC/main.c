@@ -4,7 +4,7 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-13 15:19:59
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 10:08:07
+ * @LastEditTime: 2020-12-16 11:13:16
  * @FilePath: \hu_sir-contorl\USER\SRC\main.c
  */
 #include "main.h"
@@ -254,7 +254,7 @@ re_user_set:
 }
 /*** 
  * @brief 
- * @author 未定义
+ * @author 叮咚蛋
  * @Date 2020-08-09 10:18:40
  */
 static void TaskLCD(void *pdata)
@@ -277,8 +277,8 @@ static void TaskLCD(void *pdata)
 	}
 }
 /*** 
- * @brief  check the gyroscope whose data may be drifting while search its zero
- * @author 未定义
+ * @brief  在搜索零时检查陀螺仪的数据可能正在漂移
+ * @author 叮咚蛋
  * @Date 2020-08-09 10:19:48
  */
 static void TaskGyroscope(void *pdata)
@@ -358,7 +358,7 @@ static void TaskGyroscope(void *pdata)
 }
 /*** 
  * @brief 
- * @author 未定义
+ * @author 叮咚蛋
  * @Date 2020-08-09 10:19:06
  */
 static void TaskLED(void *pdata)
