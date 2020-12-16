@@ -218,7 +218,7 @@ void Check(u8 ind_1,u8 ind_2)
 			}
 			case EQUAL:
 			{
-				if(abs(Detect_Para[ind_1][ind_2]-Motor_Para[ind_1][ind_2])<10)
+				if(ABS(Detect_Para[ind_1][ind_2]-Motor_Para[ind_1][ind_2])<10)
 					OSFlagPost(Motor_Detect, 1<<(ind_1*4+ind_2), OS_FLAG_SET,Err_MotorDetect);
 				break;
 			}
