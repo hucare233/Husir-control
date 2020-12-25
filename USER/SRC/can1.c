@@ -4,7 +4,7 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-15 19:29:29
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 10:06:14
+ * @LastEditTime: 2020-12-16 18:27:49
  * @FilePath: \hu_sir-contorl\USER\SRC\can1.c
  */
 
@@ -12,11 +12,12 @@
 
 // volatile float motorspeed[8] = {0};	   //为轴后转速 r/min TODO: 不应该放在这，以及，是否有用，待删除
 // volatile float MotorPosition[8] = {0}; //接收到的为轴后角度，需要换算成轴前角度 单位：度
+static u8 Registration2[8] = {'P', 'S', 'C', 'X', 'R', 'A', 'B','D'} ;
 
-/**
+	/**
   * @brief  CAN1初始化
   */
-MesgControlGrp CAN1_MesgSentList[CAN1_NodeNumber];
+	MesgControlGrp CAN1_MesgSentList[CAN1_NodeNumber];
 
 void Can1_Configuration(u8 prep_prio, u8 sub_prio)
 {
@@ -88,6 +89,7 @@ void Can1_Configuration(u8 prep_prio, u8 sub_prio)
 void CAN1_RX0_IRQHandler(void)
 {
 	CanRxMsg rx_message;
+	u8 i,m;
 	//这样清除标志位肯定是有问题的，因为函数参数表里没有这个参数，但是库函数有如下说法。
 	/*
 	*          10. To control CAN events you can use one of the following two methods:
@@ -142,7 +144,7 @@ void CAN1_RX0_IRQHandler(void)
 						velocity_abs.Vy = (double)((s16)(((u16)(rx_message.Data[5]) << 8) | rx_message.Data[4])) * 0.1;
 						velocity_now.Vw = (double)((s16)(((u16)(rx_message.Data[7]) << 8) | rx_message.Data[6])) * 0.1;
 
-                        /*根据绝对速度计算相对速度*/
+						/*根据绝对速度计算相对速度*/
 						velocity_now.Vx = velocity_abs.Vx * cos(position_now.angle / 180 * PI) + velocity_abs.Vy * sin(position_now.angle / 180 * PI);
 						velocity_now.Vy = (-velocity_abs.Vx * sin(position_now.angle / 180 * PI) + velocity_abs.Vy * cos(position_now.angle / 180 * PI));
 
@@ -155,7 +157,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[0].ReceiveNumber += 1;
 					CAN1_MesgSentList[0].TimeOut = 0;
 					CAN1_MesgSentList[0].SendSem--;
-					CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
 					break;
 				}
 				case 'X': /* 报文控制块发送标志位减一 */
@@ -163,7 +165,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[0].ReceiveNumber += 1;
 					CAN1_MesgSentList[0].TimeOut = 0;
 					CAN1_MesgSentList[0].SendSem--;
-					CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
 					break;
 				}
 				case 'R': //复位
@@ -172,11 +174,11 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[0].ReceiveNumber += 1;
 					CAN1_MesgSentList[0].TimeOut = 0;
 					CAN1_MesgSentList[0].SendSem--;
-					CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[0].SentQueue.Front = (CAN1_MesgSentList[0].SentQueue.Front + 1) % CAN1_MesgSentList[0].SentQueue.Can_sendqueuesize;
 					OSFlagPost(FlagCan1Check, 0x01, OS_FLAG_SET, ErrorCan1);
 					break;
 				}
-				case 'A':  //询问陀螺仪状态
+				case 'A': //询问陀螺仪状态
 				{
 					if (rx_message.Data[2] == 'S' && rx_message.Data[3] == 'K')
 						gyroscope.init_success = rx_message.Data[4];
@@ -202,7 +204,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[1].ReceiveNumber += 1;
 					CAN1_MesgSentList[1].TimeOut = 0;
 					CAN1_MesgSentList[1].SendSem--;
-					CAN1_MesgSentList[1].SentQueue.Front = (CAN1_MesgSentList[1].SentQueue.Front + 1) % CAN1_MesgSentList[4].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[1].SentQueue.Front = (CAN1_MesgSentList[1].SentQueue.Front + 1) % CAN1_MesgSentList[4].SentQueue.Can_sendqueuesize;
 					break;
 				}
 				case 'S':
@@ -211,7 +213,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[1].ReceiveNumber += 1;
 					CAN1_MesgSentList[1].TimeOut = 0;
 					CAN1_MesgSentList[1].SendSem--;
-					CAN1_MesgSentList[1].SentQueue.Front = (CAN1_MesgSentList[1].SentQueue.Front + 1) % CAN1_MesgSentList[4].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[1].SentQueue.Front = (CAN1_MesgSentList[1].SentQueue.Front + 1) % CAN1_MesgSentList[4].SentQueue.Can_sendqueuesize;
 					break;
 				}
 				case 'D':
@@ -223,7 +225,7 @@ void CAN1_RX0_IRQHandler(void)
 					OS_EXIT_CRITICAL();
 					break;
 				}
-				default: //什么东西
+				default: //
 						 //					//ErrFlag[SubIDtan90]++;
 					break;
 				}
@@ -243,7 +245,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[3].ReceiveNumber += 1;
 					CAN1_MesgSentList[3].TimeOut = 0;
 					CAN1_MesgSentList[3].SendSem--;
-					CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
 					break;
 
 				case 'S': //动作指令
@@ -251,7 +253,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[3].ReceiveNumber += 1;
 					CAN1_MesgSentList[3].TimeOut = 0;
 					CAN1_MesgSentList[3].SendSem--;
-					CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
 					break;
 
 				case 'D': //动作指令
@@ -274,7 +276,7 @@ void CAN1_RX0_IRQHandler(void)
 					CAN1_MesgSentList[3].ReceiveNumber += 1;
 					CAN1_MesgSentList[3].TimeOut = 0;
 					CAN1_MesgSentList[3].SendSem--;
-					CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
+					//CAN1_MesgSentList[3].SentQueue.Front = (CAN1_MesgSentList[3].SentQueue.Front + 1) % CAN1_MesgSentList[3].SentQueue.Can_sendqueuesize;
 					//					if(rx_message.Data[2]=='L'&&rx_message.Data[3]=='D'&&user.area_side==0)
 					//					{
 					//						if(rx_message.Data[4]=='B')
@@ -301,6 +303,18 @@ void CAN1_RX0_IRQHandler(void)
 			//			sprintf(user.error,"%s","RubishMsg");
 		}
 		break;
+		}
+		for (m = 0; m < 8; m++)
+		{
+			if (Registration2[m] == rx_message.Data[0])
+			{
+				if (can1_sendqueue.node[can1_sendqueue.Front].InConGrpFlag == TRUE && can1_sendqueue.Rear != can1_sendqueue.Front)
+				{
+					if ((can1_sendqueue.node[can1_sendqueue.Front].Id & 0xF) == i && can1_sendqueue.node[can1_sendqueue.Front].Data[0] == rx_message.Data[0] && can1_sendqueue.node[can1_sendqueue.Front].Data[1] == rx_message.Data[1])
+						can1_sendqueue.Front = (can1_sendqueue.Front + 1) % can1_sendqueue.Can_sendqueuesize;
+				}
+				break;
+			}
 		}
 	}
 }
@@ -444,7 +458,7 @@ void GyroSetXandA(float x, float A, u8 InConGrpFlag)
 /**
   * @brief  设置重定位零点
   */
-void ResetPosition_EN(float x, float y, float angle, u8 InConGrpFlag)//ASK:发送这三个数据的处理是什么
+void ResetPosition_EN(float x, float y, float angle, u8 InConGrpFlag) //ASK:发送这三个数据的处理是什么
 {
 
 	if (Rear1 == can1_sendqueue.Front)

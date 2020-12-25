@@ -1,10 +1,19 @@
 /*
+ * @Descripttion: 
+ * @version: 第一版
+ * @Author: 叮咚蛋
+ * @Date: 2020-12-15 19:29:29
+ * @LastEditors: 叮咚蛋
+ * @LastEditTime: 2020-12-23 15:47:42
+ * @FilePath: \hu_sir-contorl\USER\SRC\run.c
+ */
+/*
  * @Descripttion: run
  * @version: 第一版
  * @Author: 叮咚蛋
  * @Date: 2020-12-15 19:29:29
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 10:12:45
+ * @LastEditTime: 2020-12-22 20:43:44
  * @FilePath: \hu_sir-contorl\USER\SRC\run.c
  */
 
@@ -284,13 +293,14 @@ void CountBezierCurvaturebyT(BezierStruct volatile *bezier_para, BezierPoint vol
 	float Ydifferential1;
 	float Ydifferential2;
 	temp1 = bezier_point->t; //一次方
-	temp2 = temp1 * temp1;	 //二次方
-
+	temp2 = temp1 * temp1;	 //二次方 
+	/*一阶导数*/
 	Xdifferential1 = 3 * bezier_para->x_t[3] * temp2 + 2 * bezier_para->x_t[2] * temp1 + bezier_para->x_t[1];
 	Ydifferential1 = 3 * bezier_para->y_t[3] * temp2 + 2 * bezier_para->y_t[2] * temp1 + bezier_para->y_t[1];
-
+    /*二阶导数*/
 	Xdifferential2 = 6 * bezier_para->x_t[3] * temp1 + 2 * bezier_para->x_t[2];
 	Ydifferential2 = 6 * bezier_para->y_t[3] * temp1 + 2 * bezier_para->y_t[2];
+	/*求曲率半径*/
 	bezier_point->curvature = ABS(Xdifferential1 * Ydifferential2 - Xdifferential2 * Ydifferential1) / ((Xdifferential1 * Xdifferential1 + Ydifferential1 * Ydifferential1) * sqrt(Xdifferential1 * Xdifferential1 + Ydifferential1 * Ydifferential1));
 }
 
@@ -352,7 +362,7 @@ void RunBezier(float *points, float angle_want,
 	bezier_point1.t = 0;
 	bezier_point2.t = run.delta_t;
 	CountBezierXYbyT(&BezierData, &bezier_point1); //根据bezier_point1中的t值计算对应的坐标
-	CountBezierXYbyT(&BezierData, &bezier_point2); //根据bezier_point1中的t值计算对应的坐标
+	CountBezierXYbyT(&BezierData, &bezier_point2); //根据bezier_point2中的t值计算对应的坐标
 
 	//初始化向量Vec_Line
 	vec_line.x = bezier_point2.x - bezier_point1.x;
@@ -616,7 +626,7 @@ void RunBezierSpeedUp(void)
 		{
 			velocity_set.V = run.speed_start - (run.speed_start - velocity_set.V) * sqrt(bezier_point1.t / run.up_t);
 		}
-		else
+		else   //达到加速距离
 		{
 			velocity_set.V = velocity_set.V;
 			run.speed_up = False;
@@ -841,40 +851,40 @@ void calculate_wheel_speed(Velocity speed_wantset)
 {
 
 	/* 以下全部解算没有测试，暂时放在这，留下这个意思 */
-#ifdef OMNI_3 //全向等边三轮
+#ifdef OMNI_3 //全向等边三轮  //vw前正副号存疑
 	float WheelSpeed[3];
 	WheelSpeed[0] = (-speed_wantset.Vx - speed_wantset.Vw * Radius * PI / 180.f);
 	WheelSpeed[1] = (cos_60 * speed_wantset.Vx - cos_30 * speed_wantset.Vy - speed_wantset.Vw * Radius * PI / 180.f);
 	WheelSpeed[2] = (cos_60 * speed_wantset.Vx + cos_30 * speed_wantset.Vy - speed_wantset.Vw * Radius * PI / 180.f);
 #endif
 
-#ifdef OMNI_4a //全向正方形四轮
+#ifdef OMNI_4a //全向正方形四轮  TODO:0 1 和 2 3方向反
 	float WheelSpeed[4];
 	WheelSpeed[0] = (-cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[1] = (cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[2] = (-cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
+	WheelSpeed[1] = (-cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
+	WheelSpeed[2] = (cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
 	WheelSpeed[3] = (cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + speed_wantset.Vw * Radius * PI / 180.f);
 #endif
 #ifdef OMNI_4 //全向正方形四轮
 
 #endif
 
-#ifdef OMNI_4b //全向长方形四轮
+#ifdef OMNI_4b //全向长方形四轮 TODO:动过刀子，感觉问题很大，但是一般不是长方形就没试过
 	float WheelSpeed[4];
 	float m = 30, n = 20;
-	WheelSpeed[0] = (-cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + (m + n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[1] = (-cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + (-m + n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[2] = (cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + (-m + -n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[3] = (cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + (m + -n) * speed_wantset.Vw * Radius * PI / 180.f);
+	WheelSpeed[0] = (-cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[1] = (-cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + (m - n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[2] = (cos_45 * speed_wantset.Vx - cos_45 * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[3] = (cos_45 * speed_wantset.Vx + cos_45 * speed_wantset.Vy + (m + -n) * speed_wantset.Vw * PI / 180.f);
 #endif
 
-#ifdef MECANUM //麦克纳姆轮
+#ifdef MECANUM //麦克纳姆轮 TODO:动过刀子,改过
 	float WheelSpeed[4];
 	float m = 30, n = 20;
-	WheelSpeed[0] = (-1 * speed_wantset.Vx + (-1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[1] = (-1 * speed_wantset.Vx + (-1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[2] = (1 * speed_wantset.Vx + (1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * Radius * PI / 180.f);
-	WheelSpeed[3] = (1 * speed_wantset.Vx + (1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * Radius * PI / 180.f);
+	WheelSpeed[0] = (-1 * speed_wantset.Vx + (1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[1] = (-1 * speed_wantset.Vx + (-1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[2] = (1 * speed_wantset.Vx + (-1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
+	WheelSpeed[3] = (1 * speed_wantset.Vx + (1) * speed_wantset.Vy + (m + n) * speed_wantset.Vw * PI / 180.f);
 #endif
 
 #ifdef THREE_STEER

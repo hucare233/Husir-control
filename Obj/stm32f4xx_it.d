@@ -14,4 +14,5 @@
 .\obj\stm32f4xx_it.o: .\USER\INC\led8.h
 .\obj\stm32f4xx_it.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
 .\obj\stm32f4xx_it.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
+.\obj\stm32f4xx_it.o: .\USER\INC\led.h
 .\obj\stm32f4xx_it.o: .\USER\INC\delay.h

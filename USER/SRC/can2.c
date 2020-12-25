@@ -4,12 +4,13 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-15 19:29:29
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 15:09:26
+ * @LastEditTime: 2020-12-16 17:07:21
  * @FilePath: \hu_sir-contorl\USER\SRC\can2.c
  */
 
 #include "can2.h"
-
+static u8 Registration[2][12] = {{'B', 'S', 'U', 'M', 'S', 'P', 'M', 'M', 'M', 'M', 'A', 'B'},
+								 {'G', 'T', 'M', 'O', 'P', 'X', 'O', 'O', 'O', 'O', 'S', 'B'}};
 s32 ElmoPulse = 0;
 s32 ElmoPulselast = 0;
 s32 WheelSpeedNow[4] = {0};
@@ -130,6 +131,7 @@ CanRxMsg rx_mes;
 void CAN2_RX0_IRQHandler(void)
 {
 	int ErroCode = 0;
+	u8 i, m;
 	char str_tempp[15] = "well";
 	CanRxMsg rx_message;
 	CAN_ClearITPendingBit(CAN2, CAN_IT_FMP0);
@@ -137,6 +139,7 @@ void CAN2_RX0_IRQHandler(void)
 	if (CAN_GetITStatus(CAN2, CAN_IT_FMP0) != RESET)
 	{
 		CAN_Receive(CAN2, CAN_FIFO0, &rx_message);
+		i = rx_message.StdId & 0xF;
 		rx_mes = rx_message;
 		if ((rx_message.StdId >= 0x081 && rx_message.StdId <= 0x084) || (rx_message.StdId >= 0x181 && rx_message.StdId <= 0x184)) //电机故障处理
 		{
@@ -204,10 +207,6 @@ void CAN2_RX0_IRQHandler(void)
 				{
 					if ('O' == rx_message.Data[1])
 					{
-						/*  报文控制快是不是可以动刀*/
-						CAN2_MesgSentList[0].ReceiveNumber += 1;
-						CAN2_MesgSentList[0].TimeOut = 0;
-						CAN2_MesgSentList[0].SendSem--;
 						MOFlag[0]++;
 					}
 					break;
@@ -217,12 +216,6 @@ void CAN2_RX0_IRQHandler(void)
 				{
 					if ('T' == rx_message.Data[1]) //???ˉ
 					{
-
-						/*  报文控制块发送标志位减一  */
-						CAN2_MesgSentList[0].ReceiveNumber += 1;
-						CAN2_MesgSentList[0].TimeOut = 0;
-						CAN2_MesgSentList[0].SendSem--;
-						CAN2_MesgSentList[0].SentQueue.Front = (CAN2_MesgSentList[0].SentQueue.Front + 1) % CAN2_MesgSentList[0].SentQueue.Can_sendqueuesize;
 					}
 					break;
 				}
@@ -524,7 +517,7 @@ void CAN2_RX0_IRQHandler(void)
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].ReceiveNumber += 1;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].TimeOut = 0;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SendSem--;
-							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front = (CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front + 1) % CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Can_sendqueuesize;
+							//CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front = (CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front + 1) % CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Can_sendqueuesize;
 						}
 						break;
 					}
@@ -552,7 +545,6 @@ void CAN2_RX0_IRQHandler(void)
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].ReceiveNumber += 1;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].TimeOut = 0;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SendSem--;
-							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front = (CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front + 1) % CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Can_sendqueuesize;
 						}
 
 						else if ('P' == rx_message.Data[1])
@@ -560,7 +552,6 @@ void CAN2_RX0_IRQHandler(void)
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].ReceiveNumber += 1;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].TimeOut = 0;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SendSem--;
-							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front = (CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front + 1) % CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Can_sendqueuesize;
 						}
 						break;
 					}
@@ -572,7 +563,6 @@ void CAN2_RX0_IRQHandler(void)
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].ReceiveNumber += 1;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].TimeOut = 0;
 							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SendSem--;
-							CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front = (CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Front + 1) % CAN2_MesgSentList[(0x000f & rx_message.StdId) - 1].SentQueue.Can_sendqueuesize;
 						}
 						break;
 					}
@@ -606,9 +596,26 @@ void CAN2_RX0_IRQHandler(void)
 					}
 					//	  BEEP_ON();
 					//			sprintf(user.error,"%s","RubishMsg");
-					break;
 				}
 			}
+			}
+		}
+		for (m = 0; m < 12; m++)
+		{
+			if (Registration[1][m] == rx_message.Data[0])
+			{
+				if (Registration[2][m] == rx_message.Data[1])
+				{
+					CAN2_MesgSentList[i].ReceiveNumber += 1;
+					CAN2_MesgSentList[i].TimeOut = 0;
+					CAN2_MesgSentList[i].SendSem--;
+					if (can2_sendqueue.node[can2_sendqueue.Front].InConGrpFlag == TRUE && can2_sendqueue.Rear != can2_sendqueue.Front)
+					{
+						if ((can2_sendqueue.node[can2_sendqueue.Front].Id & 0xF) == i && can2_sendqueue.node[can2_sendqueue.Front].Data[0] == rx_message.Data[0] && can2_sendqueue.node[can2_sendqueue.Front].Data[1] == rx_message.Data[1])
+							can2_sendqueue.Front = (can2_sendqueue.Front + 1) % can2_sendqueue.Can_sendqueuesize;
+					}
+					break;
+				}
 			}
 		}
 	}

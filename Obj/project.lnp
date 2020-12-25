@@ -1,8 +1,8 @@
 --cpu=Cortex-M4.fp.sp
-".\obj\can1.o"
-".\obj\can2.o"
 ".\obj\main.o"
 ".\obj\param.o"
+".\obj\can1.o"
+".\obj\can2.o"
 ".\obj\tim3.o"
 ".\obj\usart1.o"
 ".\obj\usart2.o"
@@ -15,6 +15,7 @@
 ".\obj\run.o"
 ".\obj\queue.o"
 ".\obj\motor.o"
+".\obj\mymath.o"
 ".\obj\delay.o"
 ".\obj\led.o"
 ".\obj\led8.o"

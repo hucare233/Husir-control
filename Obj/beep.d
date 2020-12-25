@@ -1,5 +1,6 @@
 .\obj\beep.o: USER\SRC\beep.c
 .\obj\beep.o: .\USER\INC\beep.h
+.\obj\beep.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
 .\obj\beep.o: .\Libraries\CMSIS\stm32f4xx.h
 .\obj\beep.o: E:\NEW_mdk\ARM\CMSIS\5.7.0\CMSIS\Core\Include\core_cm4.h
 .\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdint.h
@@ -11,5 +12,18 @@
 .\obj\beep.o: .\USER\INC\stm32f4xx_conf.h
 .\obj\beep.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\misc.h
 .\obj\beep.o: .\Libraries\CMSIS\stm32f4xx.h
-.\obj\beep.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_gpio.h
 .\obj\beep.o: .\Libraries\STM32F4xx_StdPeriph_Driver\inc\stm32f4xx_rcc.h
+.\obj\beep.o: .\uCOSII\CONFIG\includes.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdio.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\string.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\ctype.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdlib.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\stdarg.h
+.\obj\beep.o: .\uCOSII\CORE\ucos_ii.h
+.\obj\beep.o: .\uCOSII\CONFIG\os_cfg.h
+.\obj\beep.o: .\uCOSII\PORT\os_cpu.h
+.\obj\beep.o: .\USER\INC\delay.h
+.\obj\beep.o: .\USER\INC\param.h
+.\obj\beep.o: .\USER\INC\struct.h
+.\obj\beep.o: .\USER\INC\MyMath.h
+.\obj\beep.o: E:\NEW_mdk\ARM\ARMCC\Bin\..\include\math.h

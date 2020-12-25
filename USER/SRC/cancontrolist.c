@@ -4,7 +4,7 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-10 20:21:29
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 15:29:14
+ * @LastEditTime: 2020-12-20 14:49:13
  * @FilePath: \hu_sir-contorl\USER\SRC\cancontrolist.c
  */
 
@@ -82,21 +82,21 @@ void TraversalControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_qu
 					CAN_MesgSentList[i].QUEUEFullTimeout = 0;
 					return;
 				}
-				else
-				{
-					CAN_MesgSentList[i].SendSem--;
-					CAN_MesgSentList[i].TimeOut = 0;
-					CAN_MesgSentList[i].QUEUEFullTimeout = 0;
-					can_queue->node[can_queue->Rear].Id = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].Id;
-					can_queue->node[can_queue->Rear].DLC = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].DLC;
-					can_queue->node[can_queue->Rear].InConGrpFlag = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].InConGrpFlag;
+				//				else
+				//				{
+				//					CAN_MesgSentList[i].SendSem--;
+				//					CAN_MesgSentList[i].TimeOut = 0;
+				//					CAN_MesgSentList[i].QUEUEFullTimeout = 0;
+				//					can_queue->node[can_queue->Rear].Id = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].Id;
+				//					can_queue->node[can_queue->Rear].DLC = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].DLC;
+				//					can_queue->node[can_queue->Rear].InConGrpFlag = CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].InConGrpFlag;
 
-					memcpy(&(can_queue->node[can_queue->Rear].Data[0]),
-						   &(CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].Data[0]),
-						   sizeof(u8) * can_queue->node[can_queue->Rear].DLC);
-				}
-				can_queue->Rear = (can_queue->Rear + 1) % (can_queue->Can_sendqueuesize);
-				CAN_MesgSentList[i].SentQueue.Front = (CAN_MesgSentList[i].SentQueue.Front + 1) % CAN_MesgSentList[i].SentQueue.Can_sendqueuesize;
+				//					memcpy(&(can_queue->node[can_queue->Rear].Data[0]),
+				//						   &(CAN_MesgSentList[i].SentQueue.node[CAN_MesgSentList[i].SentQueue.Front].Data[0]),
+				//						   sizeof(u8) * can_queue->node[can_queue->Rear].DLC);
+				//				}
+				//				can_queue->Rear = (can_queue->Rear + 1) % (can_queue->Can_sendqueuesize);
+				//				CAN_MesgSentList[i].SentQueue.Front = (CAN_MesgSentList[i].SentQueue.Front + 1) % CAN_MesgSentList[i].SentQueue.Can_sendqueuesize;
 			}
 			/***保护措施***/
 			if (CAN_MesgSentList[i].QUEUEFullTimeout > 10 || CAN_MesgSentList[i].SendNumber - CAN_MesgSentList[i].ReceiveNumber > 200)
@@ -156,9 +156,6 @@ void CANMesgControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_queu
 	volatile u16 ControlListID = 0xFE; //[i]对应的子板节点
 	u8 CAN_NodeNumber = 0;
 
-	if ((0 == can_queue->node[can_queue->Front].InConGrpFlag)) //？？？
-		return;
-
 	if (CAN_1 == CAN_x)
 	{
 		CAN_NodeNumber = CAN1_NodeNumber;
@@ -171,6 +168,16 @@ void CANMesgControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_queu
 		default:
 			break;
 		}
+		if (ControlListID < CAN_NodeNumber)
+		{
+			CAN_MesgSentList[ControlListID].SendSem++;
+			CAN_MesgSentList[ControlListID].SendNumber++;
+			CAN_MesgSentList[ControlListID].TimeOut++;
+			if (CAN_MesgSentList[ControlListID].TimeOut > 10)
+			{
+				queue_flag.Can1_ErrNode |= (1 << ControlListID);
+			}
+		}
 	}
 	else
 	{
@@ -179,20 +186,33 @@ void CANMesgControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_queu
 		{
 		//哪个节点
 		case 0x300: //将elmo广播帧放入报文控制块，
-		{
 			ControlListID = 0;
 			break;
-		}
-			//		case 0x306://23转向，，左侧的
-			//		{
-			//			ControlListID=2;
-			//			break;
-			//		}
-			//		case 0x305://14转向，，右侧的
-			//		{
-			//			ControlListID=1;
-			//			break;
-			//		}
+		case 0x301:
+			ControlListID = 1;
+			break;
+
+		case 0x302:
+			ControlListID = 2;
+			break;
+
+		case 0x303:
+			ControlListID = 3;
+			break;
+
+		case 0x304:
+			ControlListID = 4;
+			break;
+		case 0x306: //23转向，，左侧的
+
+			ControlListID = 5;
+			break;
+
+		case 0x305: //14转向，，右侧的
+
+			ControlListID = 6;
+			break;
+
 		default:
 			break;
 		}
@@ -210,15 +230,11 @@ void CANMesgControlList(MesgControlGrp *CAN_MesgSentList, CanSendqueue *can_queu
 		{
 			CAN_MesgSentList[ControlListID].SendSem++;
 			CAN_MesgSentList[ControlListID].SendNumber++;
-			CAN_MesgSentList[ControlListID].SentQueue.node[CAN_MesgSentList[ControlListID].SentQueue.Rear].Id = can_queue->node[can_queue->Front].Id;
-			CAN_MesgSentList[ControlListID].SentQueue.node[CAN_MesgSentList[ControlListID].SentQueue.Rear].DLC = can_queue->node[can_queue->Front].DLC;
-			CAN_MesgSentList[ControlListID].SentQueue.node[CAN_MesgSentList[ControlListID].SentQueue.Rear].InConGrpFlag = can_queue->node[can_queue->Front].InConGrpFlag;
-
-			memcpy(&(CAN_MesgSentList[ControlListID].SentQueue.node[CAN_MesgSentList[ControlListID].SentQueue.Rear].Data[0]),
-				   &(can_queue->node[can_queue->Front].Data[0]),
-				   sizeof(u8) * CAN_MesgSentList[ControlListID].SentQueue.Can_sendqueuesize);
-			CAN_MesgSentList[ControlListID].SentQueue.Rear = (CAN_MesgSentList[ControlListID].SentQueue.Rear + 1) % CAN_MesgSentList[ControlListID].SentQueue.Can_sendqueuesize;
+			CAN_MesgSentList[ControlListID].TimeOut++;
+			if (CAN_MesgSentList[ControlListID].TimeOut > 100)
+			{
+				queue_flag.Can2_ErrNode |= (1 << ControlListID);
+			}
 		}
 	}
 }
-

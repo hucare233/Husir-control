@@ -68,6 +68,7 @@ CanTxMsg tx_msg;
 void Can_DeQueue(u8 CAN_x, CanSendqueue *can_queue)
 {
 	CanTxMsg TxMessage;
+	u8 CanSendCount = 0;
 	if (can_queue->Rear == can_queue->Front)
 	{
 		queue_flag.usart_queue_full = True;
@@ -77,7 +78,7 @@ void Can_DeQueue(u8 CAN_x, CanSendqueue *can_queue)
 	{
 		queue_flag.usart_queue_full = False;
 
-		if (can_queue->node[can_queue->Front].Id < 0x800)//epos id 0x60x
+		if (can_queue->node[can_queue->Front].Id < 0x800) //epos id 0x60x
 		{
 			TxMessage.StdId = can_queue->node[can_queue->Front].Id;
 			TxMessage.IDE = CAN_ID_STD;
@@ -98,18 +99,46 @@ void Can_DeQueue(u8 CAN_x, CanSendqueue *can_queue)
 		TxMessage.DLC = can_queue->node[can_queue->Front].DLC;
 		TxMessage.RTR = CAN_RTR_DATA;
 		memcpy(&TxMessage.Data[0], &(can_queue->node[can_queue->Front].Data[0]), sizeof(u8) * TxMessage.DLC);
-		if (CAN_1 == CAN_x)
+		if (CAN_x == CAN_2) //电机的报文
 		{
-			if (CAN_Transmit(CAN1, &TxMessage) == CAN_TxStatus_NoMailBox)
-				Can_Tx_NoMailBox++;
+			while ((CAN_Transmit(CAN2, &TxMessage)) == CAN_TxStatus_NoMailBox)
+			{
+				CanSendCount++;
+				if (CanSendCount > 10)
+					break;
+			}
+			if (CanSendCount > 10)
+			{
+				queue_flag.Can2_Tx_NoMailBox++;
+			}
+			else
+			{
+				queue_flag.Can2_Tx_NoMailBox = 0;
+				CANMesgControlList(CAN2_MesgSentList, &can2_sendqueue, CAN_2);
+				if (can_queue->node[can_queue->Front].InConGrpFlag == FALSE)
+					can_queue->Front = (can_queue->Front + 1) % can_queue->Can_sendqueuesize;
+			}
 		}
-		else
+		else if (CAN_x == CAN_1)
 		{
-			if (CAN_Transmit(CAN2, &TxMessage) == CAN_TxStatus_NoMailBox)
-				Can_Tx_NoMailBox++;
+			while ((CAN_Transmit(CAN1, &TxMessage)) == CAN_TxStatus_NoMailBox)
+			{
+				CanSendCount++;
+				if (CanSendCount > 10)
+					break;
+			}
+			if (CanSendCount > 10)
+			{
+				queue_flag.Can1_Tx_NoMailBox++;
+			}
+			else
+			{
+				queue_flag.Can1_Tx_NoMailBox = 0;
+				CANMesgControlList(CAN1_MesgSentList, &can1_sendqueue, CAN_1);
+				if (can_queue->node[can_queue->Front].InConGrpFlag == FALSE)
+					can_queue->Front = (can_queue->Front + 1) % can_queue->Can_sendqueuesize;
+			}
 		}
-		tx_msg = TxMessage;
-		can_queue->Front = (can_queue->Front + 1) % can_queue->Can_sendqueuesize;
 	}
 }
 /**
@@ -167,9 +196,6 @@ u8 Usart_EnQueue(UsartSendqueue *usart_queue, uint8_t *send_buffer, u16 buffer_s
 	return True;
 }
 
-/**
-  * @brief        
-  */
 /*** 
  * @brief  USART出队函数
  * @param  usart_queue 串口队列

@@ -168,6 +168,10 @@ typedef struct _QUEUEFLAGSTRUCT
 	u8 usart_queue_full;
 	u8 Can1ControlList; //FIXME:
 	u8 Can2ControlList;
+	u8 Can1_ErrNode;
+	u8 Can2_ErrNode;
+	u8 Can1_Tx_NoMailBox;
+	u8 Can2_Tx_NoMailBox;
 } QueueFlagStruct;
 
 //flags of RunPoint or run_bizier

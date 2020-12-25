@@ -384,14 +384,9 @@
           <GroupName>USER</GroupName>
           <Files>
             <File>
-              <FileName>can1.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\USER\SRC\can1.c</FilePath>
-            </File>
-            <File>
-              <FileName>can2.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\USER\SRC\can2.c</FilePath>
+              <FileName>macro.h</FileName>
+              <FileType>5</FileType>
+              <FilePath>.\USER\INC\macro.h</FilePath>
             </File>
             <File>
               <FileName>main.c</FileName>
@@ -402,6 +397,16 @@
               <FileName>param.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\USER\SRC\param.c</FilePath>
+            </File>
+            <File>
+              <FileName>can1.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\can1.c</FilePath>
+            </File>
+            <File>
+              <FileName>can2.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\can2.c</FilePath>
             </File>
             <File>
               <FileName>tim3.c</FileName>
@@ -467,6 +472,11 @@
               <FileName>motor.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\USER\SRC\motor.c</FilePath>
+            </File>
+            <File>
+              <FileName>MyMath.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>.\USER\SRC\MyMath.c</FilePath>
             </File>
           </Files>
         </Group>

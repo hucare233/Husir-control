@@ -4,7 +4,7 @@
  * @Author: 叮咚蛋
  * @Date: 2020-12-15 19:29:29
  * @LastEditors: 叮咚蛋
- * @LastEditTime: 2020-12-16 10:20:26
+ * @LastEditTime: 2020-12-23 20:55:16
  * @FilePath: \hu_sir-contorl\USER\SRC\pid.c
  */
 
@@ -147,11 +147,7 @@ void PidRunBezier(void)
 		RunBezierRotate();
 	else if (True == run.follow_angle)
 		RunBezierFollowAngle();
-
-	/* 设置pid之前的初始基底速度xy分量 */
-	velocity_set.Vx = velocity_set.V * temp_cos;
-	velocity_set.Vy = velocity_set.V * temp_sin;
-
+    //TODO:在此处删减
 	/* 贝塞尔曲线相关微分直线向量计算 */
 	vec_actual.x = position_now.x - bezier_point1.x; //计算实际向量
 	vec_actual.y = position_now.y - bezier_point1.y;
@@ -175,8 +171,13 @@ void PidRunBezier(void)
 	vec_line_mod = sqrt(vec_line.x * vec_line.x + vec_line.y * vec_line.y);
 	temp_cos = vec_line.x / vec_line_mod; // 顺时针旋转矩阵	[ cosa	sina ][x]		[ -sina	cosa ][y]
 	temp_sin = vec_line.y / vec_line_mod;
+	
+    //TODO:此处更改
+	/* 设置pid之前的初始基底速度xy分量 */
+	velocity_set.Vx = velocity_set.V * temp_cos;
+	velocity_set.Vy = velocity_set.V * temp_sin;
 
-	/* PID计算 */
+	/* PID计算 */ /*计算法相误差*/										  /*负号很关键*/
 	run_pid.err_now = -(vec_error.y * temp_cos - vec_error.x * temp_sin); //旋转后的Vec_line 的y坐标加符号=期望值-测量值；
 
 	if (ABS(run_pid.err_now) < 0.5f)
@@ -312,7 +313,7 @@ void PidLockPoint(Position volatile lock_position)
  * @return void
  * @author 叮咚蛋
  */
-void PidLockAngle(float lock_angle)
+void PidLockAngle(float lock_angle)                         
 {
 	angle_pid.err_now = lock_angle - position_now.angle;
 	if (ABS(angle_pid.err_now) < 0.5f)
